@@ -23,14 +23,49 @@ namespace Inlm_2.Controllers
         {
             try
             {
-
-                return new OkObjectResult(await _context.Products.ToListAsync());
+                var _products = new List<ProductResponse>();
+                foreach (var item in await _context.Products.ToListAsync())
+                    _products.Add(new ProductResponse
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Price = item.Price,
+                        ArtNr = item.ArtNr,
+                        Description = item.Description,
+                        Specifications = item.Specifications,
+                        CategoryName = item.Category.ToString()
+                    });
+                return new OkObjectResult(_products);
             }
             catch(Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
             return new BadRequestResult();
+        }
+        [HttpGet("category/{id}")]
+        public async Task<IActionResult> GetProductsByCategory(int id)
+        {
+            var _products = new List<ProductResponse>();
+
+            foreach(var item in await _context.Products.ToListAsync())
+            {
+                if(((int)item.Category) == id)
+                {
+                    _products.Add(new ProductResponse
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Price = item.Price,
+                        ArtNr = item.ArtNr,
+                        Description = item.Description,
+                        Specifications = item.Specifications,
+                        CategoryName = item.Category.ToString()
+                    });
+                }
+            }
+            return new OkObjectResult(_products);
+
         }
 
         [HttpPost]
@@ -77,6 +112,64 @@ namespace Inlm_2.Controllers
                 Debug.WriteLine(ex.Message);
             }
             return new BadRequestResult();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, ProductUpdateRequest req)
+        {
+            try
+            {
+                var _product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+                if(_product != null)
+                {
+                    _product.ArtNr = req.ArtNr;
+                    _product.Price = req.Price;
+                    _product.Description = req.Description;
+                    _product.Name = req.Name;
+
+                    _context.Update(_product);
+                    await _context.SaveChangesAsync();
+                    return new OkResult();
+                }
+                else
+                {
+                    return new NotFoundResult();
+                }
+
+                
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            return new BadRequestResult();
+
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            try
+            {
+
+            var _product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+            if(_product != null)
+            {
+                    _context.Remove(_product);
+                    await _context.SaveChangesAsync();
+                    return new OkResult();
+            }
+            else
+                {
+                    return new NotFoundResult();
+                }
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            return new BadRequestResult();
+
         }
     }
 }
