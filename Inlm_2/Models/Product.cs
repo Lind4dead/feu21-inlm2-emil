@@ -12,6 +12,7 @@ namespace Inlm_2.Models
         Mobiltelefoni,
         Tillbehör
     }
+
     public class Product
     {
         [Key]

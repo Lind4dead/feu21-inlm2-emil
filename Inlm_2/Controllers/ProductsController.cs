@@ -68,6 +68,36 @@ namespace Inlm_2.Controllers
 
         }
 
+
+        [HttpGet("category")]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            try
+            {
+                var enumValues = Enum.GetValues((typeof(Categories)));
+                var _categories = new List<CategoryResponse>();
+
+                foreach (Categories category in enumValues)
+                {
+                    _categories.Add(new CategoryResponse
+                    {
+                        CategoryId = category.GetHashCode(),
+                        CategoryName = category.ToString()
+                    });
+                }
+                    
+
+                
+
+                return new OkObjectResult(_categories);
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            return new BadRequestResult();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(ProductRequest req)
         {
