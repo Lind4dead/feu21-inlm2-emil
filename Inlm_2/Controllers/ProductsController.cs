@@ -92,8 +92,6 @@ namespace Inlm_2.Controllers
 
                 }
                 
-                
-
                 _context.Add(new Product
                 {
                     Name = req.Name,
